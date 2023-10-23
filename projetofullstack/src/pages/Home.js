@@ -1,10 +1,8 @@
-// src/pages/Home.js
-import axios from 'axios';
-import React, { useEffect, useMemo, useState } from 'react'; // Importe useMemo
+import Pagination from '@mui/material/Pagination';
+import React, { useEffect, useMemo, useState } from 'react';
 import CharacterCard from '../components/CharacterCard';
-import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
-import { AppContainer, CardContainer } from '../styles/AppStyles';
+import { AppContainer, CardContainer, PaginationDiv, Title } from '../styles/AppStyles';
 
 const Home = () => {
   const [characters, setCharacters] = useState([]);
@@ -12,45 +10,50 @@ const Home = () => {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    const fetchCharacters = async () => {
+    const fetchCharacters = async (page) => {
       try {
-        const response = await axios.get(`https://rickandmortyapi.com/api/character?page=${currentPage}`);
-        if (!response.data.results) {
+        const response = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`);
+        if (!response.ok) {
           throw new Error('No data available.');
         }
-        setCharacters(response.data.results);
+        const data = await response.json();
+        setCharacters(data.results);
       } catch (error) {
         console.error(error);
       }
     };
-
-    fetchCharacters();
+  
+    fetchCharacters(currentPage);
   }, [currentPage]);
 
-  const filteredCharacters = useMemo(() => { // Use useMemo para otimizar a filtragem
-    if (!searchText) {
-      return characters;
-    }
-
+  const filteredCharacters = useMemo(() => {
     return characters.filter((character) =>
       character.name.toLowerCase().includes(searchText.toLowerCase())
     );
   }, [characters, searchText]);
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+    window.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   return (
     <AppContainer>
-      <h1>API Rick and Morty</h1>
+      <Title>Rick and Morty Characters </Title>
       <SearchBar onSearch={(text) => setSearchText(text)} />
       <CardContainer>
         {filteredCharacters.map((character) => (
           <CharacterCard key={character.id} character={character} />
         ))}
       </CardContainer>
-      <Pagination onPageChange={handlePageChange} />
+      <PaginationDiv>
+        <Pagination
+          count={20}
+          shape="rounded"
+          page={currentPage}
+          onChange={handlePageChange}
+        />
+      </PaginationDiv>
     </AppContainer>
   );
 };
