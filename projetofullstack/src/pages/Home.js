@@ -2,10 +2,13 @@ import Pagination from '@mui/material/Pagination';
 import React, { useEffect, useMemo, useState } from 'react';
 import CharacterCard from '../components/CharacterCard';
 import SearchBar from '../components/SearchBar';
+import { useRickAndMorty } from '../context/RickAndMortyContext'; // Context.API
 import { AppContainer, CardContainer, PaginationDiv, Title } from '../styles/AppStyles';
 
 const Home = () => {
-  const [characters, setCharacters] = useState([]);
+  const { state, dispatch } = useRickAndMorty(); // Context.API
+  const { characters } = state;
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
 
@@ -17,14 +20,20 @@ const Home = () => {
           throw new Error('No data available.');
         }
         const data = await response.json();
-        setCharacters(data.results);
+        // Atualize o estado do contexto com os personagens
+        dispatch({ type: 'SET_CHARACTERS', payload: data.results }); // Context.API
       } catch (error) {
         console.error(error);
       }
     };
-  
-    fetchCharacters(currentPage);
-  }, [currentPage]);
+
+    const handleFetchCharacters = async () => {
+      await fetchCharacters(currentPage);
+    };
+
+    handleFetchCharacters();
+
+  }, [currentPage, dispatch]);
 
   const filteredCharacters = useMemo(() => {
     return characters.filter((character) =>
@@ -34,19 +43,19 @@ const Home = () => {
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <AppContainer>
-      <Title>Rick and Morty Characters </Title>
+      <Title>Rick and Morty Characters </Title> {/*Styled component - Title*/}
       <SearchBar onSearch={(text) => setSearchText(text)} />
-      <CardContainer>
+      <CardContainer> {/*Styled component - CardContainer*/}
         {filteredCharacters.map((character) => (
-          <CharacterCard key={character.id} character={character} />
-        ))}
+          <CharacterCard key={character.id} character={character} /> 
+        ))} {/*Styled component - Card*/}
       </CardContainer>
-      <PaginationDiv>
+      <PaginationDiv> {/*Styled component - PaginationDiv*/}
         <Pagination
           count={20}
           shape="rounded"

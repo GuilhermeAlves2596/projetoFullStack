@@ -73,10 +73,13 @@ export const SearchInput = styled.input`
 
 export const ErrorMessage = styled.p`
   font-family: 'Playpen Sans';
-  color: #B22222;
+  color: white;
   font-size: 1.1rem;
-  padding-left: 10px;
-  -webkit-text-stroke: 0.5px #4F4F4F
+  margin-left: 20px;
+  background-color: red;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid black;
 `;
 
 export const PaginationDiv = styled.div`

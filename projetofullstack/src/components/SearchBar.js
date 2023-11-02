@@ -9,9 +9,9 @@ const SearchBar = ({ onSearch }) => {
   const handleSearchChange = (e) => {
     let text = e.target.value;
     setSearchText(text);
-
+    
     if (text.trim() === '') {
-      setErrorMessage('Please enter a name to search.');
+      setErrorMessage('Please enter a name to search!!');
       onSearch('');
     } else {
       setErrorMessage('');
@@ -20,14 +20,14 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <SearchContainer>
-      <SearchInput
+    <SearchContainer> {/*Styled component - SearchContainer*/}
+      <SearchInput 
         type="text"
         placeholder="Search by name"
         value={searchText}
         onChange={handleSearchChange}
-      />
-      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      /> {/*Styled component - SearchInput*/}
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>} {/*Styled component - ErrorMessage*/}
     </SearchContainer>
   );
 };
