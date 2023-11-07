@@ -1,38 +1,32 @@
 import Pagination from '@mui/material/Pagination';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { AppContainer } from '../components/AppContainerStyledComponent';
+import { CardContainer } from '../components/CardContainerStyledComponent';
 import CharacterCard from '../components/CharacterCard';
+import { PaginationDiv } from '../components/PaginationDivStyledComponent';
 import SearchBar from '../components/SearchBar';
+import { Title } from '../components/TitleStyledComponent';
 import { useRickAndMorty } from '../context/RickAndMortyContext'; // Context.API
-import { AppContainer, CardContainer, PaginationDiv, Title } from '../styles/AppStyles';
 
 const Home = () => {
-  const { state, dispatch } = useRickAndMorty(); // Context.API
-  const { characters } = state;
+  const { state, dispatch } = useRickAndMorty();
+  const { characters, currentPage, searchText } = state;
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchText, setSearchText] = useState('');
+  const handleFetchCharacters = async () => {
+    try {
+      const response = await fetch(`https://rickandmortyapi.com/api/character?page=${currentPage}`);
+      if (!response.ok) {
+        throw new Error('No data available.');
+      }
+      const data = await response.json();
+      dispatch({ type: 'SET_CHARACTERS', payload: data.results });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchCharacters = async (page) => {
-      try {
-        const response = await fetch(`https://rickandmortyapi.com/api/character?page=${page}`);
-        if (!response.ok) {
-          throw new Error('No data available.');
-        }
-        const data = await response.json();
-        // Atualize o estado do contexto com os personagens
-        dispatch({ type: 'SET_CHARACTERS', payload: data.results }); // Context.API
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const handleFetchCharacters = async () => {
-      await fetchCharacters(currentPage);
-    };
-
     handleFetchCharacters();
-
   }, [currentPage, dispatch]);
 
   const filteredCharacters = useMemo(() => {
@@ -42,14 +36,17 @@ const Home = () => {
   }, [characters, searchText]);
 
   const handlePageChange = (event, value) => {
-    setCurrentPage(value);
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: value });
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }
 
   return (
     <AppContainer>
       <Title>Rick and Morty Characters </Title> {/*Styled component - Title*/}
-      <SearchBar onSearch={(text) => setSearchText(text)} />
+      <SearchBar onSearch={(text) => {
+        dispatch({ type: 'SET_SEARCH_TEXT', payload: text });
+      }}
+    />
       <CardContainer> {/*Styled component - CardContainer*/}
         {filteredCharacters.map((character) => (
           <CharacterCard key={character.id} character={character} /> 

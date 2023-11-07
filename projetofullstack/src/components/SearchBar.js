@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ErrorMessage, SearchContainer, SearchInput } from '../styles/AppStyles';
-
+import { ErrorMessage } from './ErrorMessageStyledComponent';
+import { SearchContainer } from './SearchContainerStyledComponent';
+import { SearchInput } from './SearchInputStyledComponent';
 
 const SearchBar = ({ onSearch }) => {
   const [searchText, setSearchText] = useState('');

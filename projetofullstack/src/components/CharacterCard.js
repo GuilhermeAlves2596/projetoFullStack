@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '../styles/AppStyles';
+import { Card } from './CardStyledComponent.js';
 
 const CharacterCard = ({ character }) => {
   return (

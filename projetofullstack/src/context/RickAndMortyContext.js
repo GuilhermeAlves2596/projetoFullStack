@@ -4,12 +4,18 @@ const RickAndMortyContext = createContext();
 
 const initialState = {
   characters: [],
+  currentPage: 1,
+  searchText: '',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_CHARACTERS':
       return { ...state, characters: action.payload };
+    case 'SET_CURRENT_PAGE':
+      return { ...state, currentPage: action.payload };
+    case 'SET_SEARCH_TEXT':
+      return { ...state, searchText: action.payload };
     default:
       return state;
   }
