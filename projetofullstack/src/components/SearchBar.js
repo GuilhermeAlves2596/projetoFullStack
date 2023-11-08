@@ -11,7 +11,7 @@ const SearchBar = ({ onSearch }) => {
     let text = e.target.value;
     setSearchText(text);
     
-    if (text.trim() === '') {
+    if (text.length < 3) {
       setErrorMessage('Please enter a name to search!!');
       onSearch('');
     } else {
