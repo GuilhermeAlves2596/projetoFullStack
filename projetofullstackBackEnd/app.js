@@ -10,8 +10,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 var userRoutes = require('./routes/userRoutes')
+var cardRoutes = require('./routes/cartaRoutes')
 
 app.use('/user', userRoutes)
+app.use('/card', cardRoutes)
 
 
 module.exports = app;
