@@ -9,9 +9,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// var userRoutes = require('./routes/userRoutes')
+var userRoutes = require('./routes/userRoutes')
 
-// app.use('/user', userRoutes)
+app.use('/user', userRoutes)
 
 
 module.exports = app;

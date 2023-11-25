@@ -24,22 +24,21 @@ module.exports = {
         return user;
     },
 
-    save: async function (nome, usuario, senha) {
+    save: async function (nome, usuario, pass) {
 
         const user = userModel.create({
             nome: nome,
             usuario: usuario,
-            senha: senha
+            senha: pass
         })
         return user;
     },
 
-    consultaLogin: async function (usuario, senha) {
+    consultaLogin: async function (usuario) {
         try {
-            const user = await userModel.findAll({
+            const user = await userModel.findOne({
                 where: {
-                    usuario: usuario,
-                    senha: senha
+                    usuario: usuario
                 }
             });
             return user;
