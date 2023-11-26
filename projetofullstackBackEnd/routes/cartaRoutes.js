@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
 const sequelize = require('../helpers/bd');
+const cache = require('../helpers/redis') // Parei aqui, continuar implementação redis nas rotas
 
 // List all
 router.get('/', async (req, res) => {
