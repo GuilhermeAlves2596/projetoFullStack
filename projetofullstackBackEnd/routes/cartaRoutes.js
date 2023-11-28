@@ -2,7 +2,8 @@ var express = require('express')
 var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
 const sequelize = require('../helpers/bd');
-const cache = require('../helpers/redis') // Parei aqui, continuar implementação redis nas rotas
+const functions = require('../functions/validData')
+
 
 // List all
 router.get('/', async (req, res) => {
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
 })
 
 // Save
-router.post('/', async (req, res) => {
+router.post('/', functions.validData, async (req, res) => {
 
     await sequelize.sync({ force: false })
 
@@ -21,6 +22,8 @@ router.post('/', async (req, res) => {
     try {
 
         await cartaDAO.save(image, name, status, species, gender);
+
+
 
         res.json({ status: true, msg: "Carta cadastrada com sucesso" });
     } catch (err) {
