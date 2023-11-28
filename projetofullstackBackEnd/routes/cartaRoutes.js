@@ -3,10 +3,15 @@ var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
 const sequelize = require('../helpers/bd');
 const functions = require('../functions/validData')
+const cache = require('express-redis-cache')({
+    prefix: 'RickAndMorty',
+    host: 'localhost',
+    port: 6379,
+ });
 
 
 // List all
-router.get('/', async (req, res) => {
+router.get('/', cache.route(), async (req, res) => {
 
     let cartas = await cartaDAO.list();
     res.json({ status: true, msg: 'Cartas cadastradss: ', cartas })
@@ -23,7 +28,7 @@ router.post('/', functions.validData, async (req, res) => {
 
         await cartaDAO.save(image, name, status, species, gender);
 
-
+        cache.del('/');
 
         res.json({ status: true, msg: "Carta cadastrada com sucesso" });
     } catch (err) {
@@ -38,6 +43,7 @@ router.delete('/:id', async (req, res) => {
     try {
         let carta = await cartaDAO.delete(req.params.id)
         if(carta){
+            cache.del('/');
             res.json({status: true, msg:'Carta excluida com sucesso'})
         } else {
             res.status(403).json({status: false, msg: 'Erro ao excluir a carta'})
