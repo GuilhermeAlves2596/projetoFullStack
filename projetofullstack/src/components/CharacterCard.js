@@ -1,14 +1,14 @@
 import React from 'react';
 import { Card } from './CardStyledComponent.js';
 
-const CharacterCard = ({ character }) => {
+const CharacterCard = ({ card }) => {
   return (
     <Card> {/*Styled component - Card*/}
-      <img src={character.image} alt={character.name} />
-      <h3>{character.name}</h3>
-      <p>Status: {character.status}</p>
-      <p>Species: {character.species}</p>
-      <p>Gender: {character.gender}</p>
+      <img src={card.image} alt={card.name} />
+      <h3>{card.name}</h3>
+      <p>Status: {card.status}</p>
+      <p>Species: {card.species}</p>
+      <p>Gender: {card.gender}</p>
     </Card>
   );
 };

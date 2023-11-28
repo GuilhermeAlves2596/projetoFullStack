@@ -1,6 +1,8 @@
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AppContainer } from '../components/AppContainerStyledComponent';
 import { CardContainer } from '../components/CardContainerStyledComponent';
 import CardForm from '../components/CardForm';
@@ -27,24 +29,45 @@ const Home = () => {
 
   const handleFetchCharacters = async () => {
     try {
-      const response = await fetch(`https://rickandmortyapi.com/api/character?page=${currentPage}`);
+      const response = await fetch(`http://localhost:3001/card`);
       if (!response.ok) {
         throw new Error('No data available.');
       }
       const data = await response.json();
-      dispatch({ type: 'SET_CHARACTERS', payload: data.results });
+      dispatch({ type: 'SET_CHARACTERS', payload: data.cartas });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleCardSubmit = (name, image, status, species, gender) => {
-    console.log('Card submitted: ' +name);
-    console.log('Card submitted: ' +image);
-    console.log('Card submitted: ' +status);
-    console.log('Card submitted: ' +species);
-    console.log('Card submitted: ' +gender);
+  const handleCardSubmit = async (name, image, status, species, gender) => {
     // Lógica para salvar o card (por exemplo, enviar para um servidor)
+    try {
+      const response = await fetch('http://localhost:3001/card', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          image,
+          status,
+          species,
+          gender,
+        }),
+      });
+
+      if(!response.ok){
+        throw new Error('Falha ao salvar o card');
+      }
+
+      toast.success('Carta salva com sucesso!', { position: toast.POSITION.TOP_RIGHT });
+
+      dispatch({ type: 'SET_CHARACTERS', payload: [...characters, { name, image, status, species, gender }] });
+    } catch (error) {
+      console.error('Erro ao salvar o card: ', error)
+      toast.error('Erro ao salvar o card. Por favor, tente novamente.', { position: toast.POSITION.TOP_RIGHT });
+    }
   };
 
   useEffect(() => {
@@ -52,6 +75,10 @@ const Home = () => {
   }, [currentPage, dispatch]);
 
   const filteredCharacters = useMemo(() => {
+    if (!characters) {
+      return [];
+    }
+
     return characters.filter((character) =>
       character.name.toLowerCase().includes(searchText.toLowerCase())
     );
@@ -78,8 +105,8 @@ const Home = () => {
         <CardForm onSubmit={handleCardSubmit} onClose={handleCloseModal}></CardForm>
       </CustomModal>
       <CardContainer> {/*Styled component - CardContainer*/}
-        {filteredCharacters.map((character) => (
-          <CharacterCard key={character.id} character={character} />
+        {filteredCharacters.map((card) => (
+          <CharacterCard key={card.id} card={card} />
         ))} {/*Styled component - Card*/}
       </CardContainer>
       <PaginationDiv> {/*Styled component - PaginationDiv*/}
