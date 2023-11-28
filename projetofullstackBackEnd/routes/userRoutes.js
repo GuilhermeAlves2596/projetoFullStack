@@ -4,10 +4,31 @@ var userDAO = require('../model/userModel')
 const sequelize = require('../helpers/bd');
 const hashPassword = require('../functions/hashPassword');
 const bcrypt = require('bcrypt');
+const cache = require('express-redis-cache')({
+    prefix: 'userRoutes',
+    host: 'localhost', // ou o endereço IP do seu servidor Redis
+    port: 6379,
+    expire: 60,
+ });
 
+ cache.invalidate = (name) => {
+    return (req, res, next) => {
+       const route_name = name ? name : req.url;
+       if (!cache.connected) {
+          next();
+          return;
+       }
+       cache.del(route_name, (err) => {
+          if (err) {
+             console.error(err);
+          }
+          next();
+       });
+    };
+ };
 
 // List all
-router.get('/', async (req, res) => {
+router.get('/', cache.route(), async (req, res) => {
 
     let user = await userDAO.list();
     res.json({ status: true, msg: 'Usuarios cadastrados: ', user })
@@ -41,9 +62,9 @@ router.post('/login', async (req, res) => {
 });
 
 // Save
-router.post('/', async (req, res) => {
+router.post('/', cache.invalidate(), async (req, res) => {
 
-    await sequelize.sync({ force: true })
+    await sequelize.sync({ force: false })
 
     const { nome, usuario, senha } = req.body;
 

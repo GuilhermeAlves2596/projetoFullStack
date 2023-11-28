@@ -40,4 +40,18 @@ module.exports = {
         return carta.destroy()
     },
 
+    getCardByName: async function (name) {
+        try {
+            const card = await cartaModel.findOne({
+                where: {
+                    name: name,
+                }
+            })
+            return card;
+        } catch (error) {
+            console.error('Erro ao buscar uma carta', error)
+            throw error
+        }
+    }
+
 }

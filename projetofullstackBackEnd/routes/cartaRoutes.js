@@ -4,11 +4,28 @@ var cartaDAO = require('../model/cartaModel')
 const sequelize = require('../helpers/bd');
 const functions = require('../functions/validData')
 const cache = require('express-redis-cache')({
-    prefix: 'RickAndMorty',
+    prefix: 'cardRoutes',
     host: 'localhost',
     port: 6379,
+    expire: 60,
  });
 
+ cache.invalidate = (name) => {
+    return (req, res, next) => {
+        const route_name = name ? name : req.url;
+        if (!cache.connected) {
+            next();
+            return;
+        }
+
+        cache.del(route_name, (err) => {
+            if (err) {
+                console.error(err);
+            }
+            next();
+        });
+    };
+};
 
 // List all
 router.get('/', cache.route(), async (req, res) => {
@@ -18,7 +35,7 @@ router.get('/', cache.route(), async (req, res) => {
 })
 
 // Save
-router.post('/', functions.validData, async (req, res) => {
+router.post('/', functions.validData, cache.invalidate(), async (req, res) => {
 
     await sequelize.sync({ force: false })
 
@@ -28,14 +45,28 @@ router.post('/', functions.validData, async (req, res) => {
 
         await cartaDAO.save(image, name, status, species, gender);
 
-        cache.del('/');
-
         res.json({ status: true, msg: "Carta cadastrada com sucesso" });
     } catch (err) {
         console.log(err);
         res.status(500).json({ status: false, msg: "Carta não cadastrada", err });
     }
 
+})
+
+// Get by name
+router.get('/:name', cache.route(), async (req, res) => {
+    try {
+        const {name} = req.params
+        const result = await cartaDAO.getCardByName(name)
+        if(!result){
+            res.json({status: false, msg: 'Carta não encontrada'})
+        } else {
+            res.json({status: true, msg: 'Carta encontrada', result})
+        }
+
+    } catch (error) {
+        console.error('Erro ao buscar a carta: ', error)
+    }
 })
 
 // Delete
