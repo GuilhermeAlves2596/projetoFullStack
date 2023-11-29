@@ -41,7 +41,6 @@ const Home = () => {
   };
 
   const handleCardSubmit = async (name, image, status, species, gender) => {
-    // Lógica para salvar o card (por exemplo, enviar para um servidor)
     try {
       const response = await fetch('http://localhost:3001/card', {
         method: 'POST',
@@ -58,6 +57,7 @@ const Home = () => {
       });
 
       if(!response.ok){
+        console.log('Erro ao salvar o card: ')
         throw new Error('Falha ao salvar o card');
       }
 
@@ -66,7 +66,7 @@ const Home = () => {
       dispatch({ type: 'SET_CHARACTERS', payload: [...characters, { name, image, status, species, gender }] });
     } catch (error) {
       console.error('Erro ao salvar o card: ', error)
-      toast.error('Erro ao salvar o card. Por favor, tente novamente.', { position: toast.POSITION.TOP_RIGHT });
+      toast.error('Erro ao salvar o card. Por favor, preencha todos os campos.', { position: toast.POSITION.TOP_RIGHT });
     }
   };
 
