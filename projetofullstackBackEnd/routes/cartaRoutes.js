@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
+var buscaDAO = require('../model/buscaModel')
 const sequelize = require('../helpers/bd');
 const functions = require('../functions/validData')
 const jwtToken = require('../functions/jwtToken')
@@ -52,12 +53,13 @@ router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate()
 
 // Get by name
 router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => {
-    try {
+    try {      
         const {name} = req.params
         const result = await cartaDAO.getCardByName(name)
         if(!result){
             res.json({status: false, msg: 'Carta não encontrada'})
         } else {
+            await buscaDAO.save(result.name, 'Carta')
             res.json({status: true, msg: 'Carta encontrada', result})
         }
 

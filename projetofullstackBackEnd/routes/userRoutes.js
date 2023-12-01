@@ -68,7 +68,6 @@ router.post('/login', async (req, res) => {
 
 // Save
 router.post('/', cache.invalidate(), async (req, res) => {
-    await sequelize.sync({ force: false })
 
     const { nome, usuario, senha } = req.body;
 
