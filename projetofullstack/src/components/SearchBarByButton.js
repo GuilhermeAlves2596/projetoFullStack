@@ -6,6 +6,7 @@ import CustomModal from '../components/CustomModal';
 import { ErrorMessage } from './ErrorMessageStyledComponent';
 import { SearchContainer } from './SearchContainerStyledComponent';
 import { SearchInput } from './SearchInputStyledComponent';
+const token = localStorage.getItem('token')
 
 const SearchBarByButton = () => {
   const [searchText, setSearchText] = useState('');
@@ -30,7 +31,12 @@ const SearchBarByButton = () => {
       const endpoint = `http://localhost:3001/card/${searchText}`;
 
       // Usando a função fetch
-      fetch(endpoint)
+      fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': token,
+        }
+      })
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
