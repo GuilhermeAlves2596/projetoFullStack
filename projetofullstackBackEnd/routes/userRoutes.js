@@ -1,12 +1,14 @@
 var express = require('express')
 var router = express.Router();
 var userDAO = require('../model/userModel')
+var jwt = require('jsonwebtoken');
 const sequelize = require('../helpers/bd');
 const hashPassword = require('../functions/hashPassword');
 const bcrypt = require('bcrypt');
+const { token } = require('morgan')
 const cache = require('express-redis-cache')({
     prefix: 'userRoutes',
-    host: 'localhost', // ou o endereço IP do seu servidor Redis
+    host: 'localhost', 
     port: 6379,
     expire: 60,
  });
@@ -48,7 +50,10 @@ router.post('/login', async (req, res) => {
             const senhaCorreta = await bcrypt.compare(senha, usuarioCadastrado.senha);
 
             if (senhaCorreta) {
-                res.json({ user: usuarioCadastrado, status: true, msg: "Login efetuado com sucesso"});
+                let token = jwt.sign({usuario: usuario}, process.env.DB_TOKEN, {
+                    expiresIn: '1h'
+                })
+                res.json({ user: usuarioCadastrado, token: token, status: true, msg: "Login efetuado com sucesso"});
             } else {
                 res.status(403).json({ status: false, msg: 'Senha incorreta' });
             }
@@ -63,22 +68,19 @@ router.post('/login', async (req, res) => {
 
 // Save
 router.post('/', cache.invalidate(), async (req, res) => {
-
     await sequelize.sync({ force: false })
 
     const { nome, usuario, senha } = req.body;
 
     try {
         const hashedPassword = await hashPassword.generatePassword(senha);
-
         await userDAO.save(nome, usuario, hashedPassword);
 
-        res.json({ status: true, msg: "Usuario cadastrado com sucesso" });
+        res.json({ status: true, msg: "Usuário cadastrado com sucesso" });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ status: false, msg: "Usuario não cadastrado", err });
+        res.status(500).json({ status: false, msg: "Usuário não cadastrado", err });
     }
-
-})
+});
 
 module.exports = router;

@@ -3,6 +3,7 @@ var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
 const sequelize = require('../helpers/bd');
 const functions = require('../functions/validData')
+const jwtToken = require('../functions/jwtToken')
 const cache = require('express-redis-cache')({
     prefix: 'cardRoutes',
     host: 'localhost',
@@ -28,33 +29,29 @@ const cache = require('express-redis-cache')({
 };
 
 // List all
-router.get('/', cache.route(), async (req, res) => {
+router.get('/', jwtToken.validateToken, cache.route(), async (req, res) => {
 
     let cartas = await cartaDAO.list();
     res.json({ status: true, msg: 'Cartas cadastradss: ', cartas })
 })
 
 // Save
-router.post('/', functions.validData, cache.invalidate(), async (req, res) => {
-
+router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate(), async (req, res) => {
     await sequelize.sync({ force: false })
 
     const { image, name, status, species, gender } = req.body;
 
     try {
-
         await cartaDAO.save(image, name, status, species, gender);
-
         res.json({ status: true, msg: "Carta cadastrada com sucesso" });
     } catch (err) {
         console.log(err);
         res.status(500).json({ status: false, msg: "Carta não cadastrada", err });
     }
-
-})
+});
 
 // Get by name
-router.get('/:name', cache.route(), async (req, res) => {
+router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => {
     try {
         const {name} = req.params
         const result = await cartaDAO.getCardByName(name)
