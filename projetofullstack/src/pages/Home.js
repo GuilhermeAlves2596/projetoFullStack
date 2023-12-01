@@ -10,7 +10,7 @@ import CharacterCard from '../components/CharacterCard';
 import { ContainerButton } from '../components/ContainerButtonComponent';
 import CustomModal from '../components/CustomModal';
 import { PaginationDiv } from '../components/PaginationDivStyledComponent';
-import SearchBar from '../components/SearchBar';
+import SearchBarByButton from '../components/SearchBarByButton';
 import { Title } from '../components/TitleStyledComponent';
 import { useRickAndMorty } from '../context/RickAndMortyContext'; // Context.API
 
@@ -18,6 +18,8 @@ const Home = () => {
   const { state, dispatch } = useRickAndMorty();
   const { characters, currentPage, searchText } = state;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const token = localStorage.getItem('token')
+
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -29,7 +31,12 @@ const Home = () => {
 
   const handleFetchCharacters = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/card`);
+      const response = await fetch(`http://localhost:3001/card`, {
+        method: 'GET',
+        headers: {
+          'Authorization': token,
+        }
+      });
       if (!response.ok) {
         throw new Error('No data available.');
       }
@@ -42,10 +49,12 @@ const Home = () => {
 
   const handleCardSubmit = async (name, image, status, species, gender) => {
     try {
+
       const response = await fetch('http://localhost:3001/card', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token,
         },
         body: JSON.stringify({
           name,
@@ -56,7 +65,7 @@ const Home = () => {
         }),
       });
 
-      if(!response.ok){
+      if (!response.ok) {
         console.log('Erro ao salvar o card: ')
         throw new Error('Falha ao salvar o card');
       }
@@ -94,13 +103,20 @@ const Home = () => {
       <Title>Rick and Morty Characters </Title> {/*Styled component - Title*/}
       <ContainerButton>
         <Button variant="contained" style={{ marginRight: '20px', backgroundColor: '#ADFF2F', color: 'black', width: '10rem' }}
-                onClick={handleOpenModal}>Nova carta</Button>
+          onClick={handleOpenModal}>Nova carta</Button>
         <Button variant="contained" style={{ backgroundColor: 'red' }}>Sair</Button>
       </ContainerButton>
-      <SearchBar onSearch={(text) => {
-        dispatch({ type: 'SET_SEARCH_TEXT', payload: text });
-      }}
-      />
+
+
+
+
+
+
+
+
+        <SearchBarByButton/>
+
+
       <CustomModal isOpen={isModalOpen} onRequestClose={handleCloseModal}>
         <CardForm onSubmit={handleCardSubmit} onClose={handleCloseModal}></CardForm>
       </CustomModal>

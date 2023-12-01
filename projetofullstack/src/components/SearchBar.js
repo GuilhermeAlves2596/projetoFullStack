@@ -3,6 +3,7 @@ import { ErrorMessage } from './ErrorMessageStyledComponent';
 import { SearchContainer } from './SearchContainerStyledComponent';
 import { SearchInput } from './SearchInputStyledComponent';
 
+
 const SearchBar = ({ onSearch }) => {
   const [searchText, setSearchText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -10,7 +11,7 @@ const SearchBar = ({ onSearch }) => {
   const handleSearchChange = (e) => {
     let text = e.target.value;
     setSearchText(text);
-    
+
     if (text.length < 3) {
       setErrorMessage('Please enter a name to search!!');
       onSearch('');
@@ -22,12 +23,13 @@ const SearchBar = ({ onSearch }) => {
 
   return (
     <SearchContainer> {/*Styled component - SearchContainer*/}
-      <SearchInput 
+      <SearchInput
         type="text"
         placeholder="Search by name"
         value={searchText}
         onChange={handleSearchChange}
-      /> {/*Styled component - SearchInput*/}
+      />{/*Styled component - SearchInput*/}
+
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>} {/*Styled component - ErrorMessage*/}
     </SearchContainer>
   );

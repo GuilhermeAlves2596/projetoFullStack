@@ -1,7 +1,15 @@
 import React from 'react';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root'); 
+Modal.setAppElement('#root');
+
+const centerContentStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+};
 
 const CustomModal = ({ isOpen, onRequestClose, children }) => {
   return (
@@ -13,7 +21,7 @@ const CustomModal = ({ isOpen, onRequestClose, children }) => {
           backgroundColor: 'rgba(0, 0, 0, 0.5)'
         },
         content: {
-          backgroundColor: '#E6E6FA',
+          backgroundColor: '#B0E0E6',
           borderRadius: '20px',
           border: '2px solid black',
           width: '35rem',
@@ -22,7 +30,9 @@ const CustomModal = ({ isOpen, onRequestClose, children }) => {
         }
       }}
     >
-      {children}
+      <div style={centerContentStyle}>
+        {children}
+      </div>
     </Modal>
   );
 };

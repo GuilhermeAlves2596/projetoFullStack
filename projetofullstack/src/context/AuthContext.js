@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
             // Verifica se a resposta da API indica autenticação bem-sucedida
             const isAuthenticated = data.status === true;
-
+            localStorage.setItem('token', data.token) // Parei aqui, pegando o token
             setIsAuthenticated(isAuthenticated);
 
             return isAuthenticated;
