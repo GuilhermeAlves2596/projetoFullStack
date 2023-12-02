@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router();
 var userDAO = require('../model/userModel')
 var jwt = require('jsonwebtoken');
+const functions = require('../functions/validData')
 const sequelize = require('../helpers/bd');
 const hashPassword = require('../functions/hashPassword');
 const bcrypt = require('bcrypt');
@@ -39,7 +40,14 @@ router.get('/', cache.route(), async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
-    const { usuario, senha } = req.body;
+    const { usuario = '', senha = '' } = req.body;
+    let msg;
+
+    if(!usuario || !senha){
+        msg = 'Usuario ou senha vazios - user: ' +usuario + ' - senha: ' +senha;
+        functions.validLogin(msg)
+        return res.status(500).json({ status: false, msg: 'Digite o usuario e senha'});
+    }
 
     try {
         // Consulta o usuário no banco de dados
@@ -53,16 +61,22 @@ router.post('/login', async (req, res) => {
                 let token = jwt.sign({usuario: usuario}, process.env.DB_TOKEN, {
                     expiresIn: '1h'
                 })
-                res.json({ user: usuarioCadastrado, token: token, status: true, msg: "Login efetuado com sucesso"});
+                return res.json({ user: usuarioCadastrado, token: token, status: true, msg: "Login efetuado com sucesso"});
             } else {
-                res.status(403).json({ status: false, msg: 'Senha incorreta' });
+                msg = 'Senha incorreta: ' +senha;
+                functions.validLogin(msg)
+                return res.status(403).json({ status: false, msg: 'Senha incorreta' });
             }
         } else {
-            res.status(403).json({ status: false, msg: 'Usuário não encontrado' });
+            msg = 'Usuario incorreto: ' +usuario;
+            functions.validLogin(msg)
+            return res.status(403).json({ status: false, msg: 'Usuário não encontrado' });
         }
     } catch (error) {
+        let msg = 'Erro durante o login' +error;
+        functions.validLogin(msg)
         console.error(error);
-        res.status(500).json({ status: false, msg: 'Erro durante o login', error });
+        return res.status(500).json({ status: false, msg: 'Erro durante o login', error });
     }
 });
 

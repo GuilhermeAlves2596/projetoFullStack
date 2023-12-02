@@ -12,6 +12,16 @@ const cache = require('express-redis-cache')({
     expire: 60,
  });
 
+ const amqp = require('amqplib'); 
+ const rabbitmqConfig = {
+    protocol: 'amqp',
+    hostname: 'localhost',
+    port: 5672,
+    username: 'guest',
+    password: 'guest',
+    vhost: '/',
+};
+
  cache.invalidate = (name) => {
     return (req, res, next) => {
         const route_name = name ? name : req.url;
@@ -55,8 +65,11 @@ router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate()
 router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => {
     try {      
         const {name} = req.params
+        let msg;
         const result = await cartaDAO.getCardByName(name)
         if(!result){
+            msg = 'Erro - Carta não encontrada: '+name;
+            functions.errorCard(msg)
             res.json({status: false, msg: 'Carta não encontrada'})
         } else {
             await buscaDAO.save(result.name, 'Carta')
@@ -64,6 +77,8 @@ router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => 
         }
 
     } catch (error) {
+        let msg = 'Erro ao buscar a carta: ' +error
+        functions.errorCard(msg)
         console.error('Erro ao buscar a carta: ', error)
     }
 })
