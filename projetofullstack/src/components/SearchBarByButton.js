@@ -6,14 +6,15 @@ import CustomModal from '../components/CustomModal';
 import { ErrorMessage } from './ErrorMessageStyledComponent';
 import { SearchContainer } from './SearchContainerStyledComponent';
 import { SearchInput } from './SearchInputStyledComponent';
-const token = localStorage.getItem('token')
+
 
 const SearchBarByButton = () => {
   const [searchText, setSearchText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
-
+  const token = localStorage.getItem('token')
+  
   const handleSearchChange = (e) => {
     let text = e.target.value;
     setSearchText(text);
@@ -27,7 +28,7 @@ const SearchBarByButton = () => {
 
   const handleSearchClick = () => {
     if (searchText.length >= 3 && !showModal) {
-
+      console.log('Pesquisa: '+token)
       const endpoint = `http://localhost:3001/card/${searchText}`;
 
       // Usando a função fetch

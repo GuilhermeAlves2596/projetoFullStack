@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import Pagination from '@mui/material/Pagination';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,9 +8,9 @@ import CardForm from '../components/CardForm';
 import CharacterCard from '../components/CharacterCard';
 import { ContainerButton } from '../components/ContainerButtonComponent';
 import CustomModal from '../components/CustomModal';
-import { PaginationDiv } from '../components/PaginationDivStyledComponent';
 import SearchBarByButton from '../components/SearchBarByButton';
 import { Title } from '../components/TitleStyledComponent';
+import { useAuth } from '../context/AuthContext';
 import { useRickAndMorty } from '../context/RickAndMortyContext'; // Context.API
 
 const Home = () => {
@@ -19,7 +18,9 @@ const Home = () => {
   const { characters, currentPage, searchText } = state;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = localStorage.getItem('token')
+  const { logout } = useAuth();
 
+  console.log('Home: ' + token)
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -28,7 +29,7 @@ const Home = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-
+  // Listar todas as cartas
   const handleFetchCharacters = async () => {
     try {
       const response = await fetch(`http://localhost:3001/card`, {
@@ -46,10 +47,10 @@ const Home = () => {
       console.error(error);
     }
   };
-
+  // Salvar uma carta
   const handleCardSubmit = async (name, image, status, species, gender) => {
     try {
-
+      console.log('Salvar: ' + token)
       const response = await fetch('http://localhost:3001/card', {
         method: 'POST',
         headers: {
@@ -98,25 +99,19 @@ const Home = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <AppContainer>
       <Title>Rick and Morty Characters </Title> {/*Styled component - Title*/}
       <ContainerButton>
         <Button variant="contained" style={{ marginRight: '20px', backgroundColor: '#ADFF2F', color: 'black', width: '10rem' }}
           onClick={handleOpenModal}>Nova carta</Button>
-        <Button variant="contained" style={{ backgroundColor: 'red' }}>Sair</Button>
+        <Button variant="contained" style={{ backgroundColor: 'red' }} onClick={handleLogout}>Sair</Button>
       </ContainerButton>
-
-
-
-
-
-
-
-
-        <SearchBarByButton/>
-
-
+      <SearchBarByButton />
       <CustomModal isOpen={isModalOpen} onRequestClose={handleCloseModal}>
         <CardForm onSubmit={handleCardSubmit} onClose={handleCloseModal}></CardForm>
       </CustomModal>
@@ -125,14 +120,14 @@ const Home = () => {
           <CharacterCard key={card.id} card={card} />
         ))} {/*Styled component - Card*/}
       </CardContainer>
-      <PaginationDiv> {/*Styled component - PaginationDiv*/}
+      {/* <PaginationDiv> 
         <Pagination
           count={20}
           shape="rounded"
           page={currentPage}
           onChange={handlePageChange}
         />
-      </PaginationDiv>
+      </PaginationDiv> */}  {/*Styled component - PaginationDiv*/}
     </AppContainer>
   );
 };
