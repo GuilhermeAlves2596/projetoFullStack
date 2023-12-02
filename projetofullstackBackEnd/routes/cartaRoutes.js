@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router();
 var cartaDAO = require('../model/cartaModel')
 var buscaDAO = require('../model/buscaModel')
+var sanitizer = require('sanitizer');
 const sequelize = require('../helpers/bd');
 const functions = require('../functions/validData')
 const jwtToken = require('../functions/jwtToken')
@@ -40,7 +41,7 @@ const cache = require('express-redis-cache')({
 };
 
 // List all
-router.get('/', jwtToken.validateToken, cache.route(), async (req, res) => {
+router.get('/', jwtToken.validateToken, async (req, res) => {
 
     let cartas = await cartaDAO.list();
     res.json({ status: true, msg: 'Cartas cadastradss: ', cartas })
@@ -50,7 +51,13 @@ router.get('/', jwtToken.validateToken, cache.route(), async (req, res) => {
 router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate(), async (req, res) => {
     await sequelize.sync({ force: false })
 
-    const { image, name, status, species, gender } = req.body;
+    let { image, name, status, species, gender } = req.body;
+
+    image = sanitizer.sanitize(image)
+    name = sanitizer.sanitize(name)
+    status = sanitizer.sanitize(status)
+    species = sanitizer.sanitize(species)
+    gender = sanitizer.sanitize(gender)
 
     try {
         await cartaDAO.save(image, name, status, species, gender);
@@ -65,6 +72,9 @@ router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate()
 router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => {
     try {      
         const {name} = req.params
+        
+        name = sanitizer.sanitize(name)
+
         let msg;
         const result = await cartaDAO.getCardByName(name)
         if(!result){

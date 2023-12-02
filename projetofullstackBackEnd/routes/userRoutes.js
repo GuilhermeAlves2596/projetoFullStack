@@ -2,11 +2,12 @@ var express = require('express')
 var router = express.Router();
 var userDAO = require('../model/userModel')
 var jwt = require('jsonwebtoken');
+var sanitizer = require('sanitizer');
 const functions = require('../functions/validData')
 const sequelize = require('../helpers/bd');
 const hashPassword = require('../functions/hashPassword');
 const bcrypt = require('bcrypt');
-const { token } = require('morgan')
+const { token } = require('morgan');
 const cache = require('express-redis-cache')({
     prefix: 'userRoutes',
     host: 'localhost', 
@@ -40,8 +41,11 @@ router.get('/', cache.route(), async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
-    const { usuario = '', senha = '' } = req.body;
+    let { usuario = '', senha = '' } = req.body;
     let msg;
+
+    usuario = sanitizer.sanitize(usuario);
+    senha = sanitizer.sanitize(senha);
 
     if(!usuario || !senha){
         msg = 'Usuario ou senha vazios - user: ' +usuario + ' - senha: ' +senha;
