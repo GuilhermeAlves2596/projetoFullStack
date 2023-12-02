@@ -71,7 +71,7 @@ router.post('/', jwtToken.validateToken, functions.validData, cache.invalidate()
 // Get by name
 router.get('/:name', jwtToken.validateToken, cache.route(), async (req, res) => {
     try {      
-        const {name} = req.params
+        let {name} = req.params
         
         name = sanitizer.sanitize(name)
 
