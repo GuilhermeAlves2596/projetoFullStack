@@ -30,7 +30,6 @@ const SearchBarByButton = () => {
     if (searchText.length >= 3 && !showModal) {
       const endpoint = `http://localhost:3001/card/${searchText}`;
 
-      // Usando a função fetch
       fetch(endpoint, {
         method: 'GET',
         headers: {

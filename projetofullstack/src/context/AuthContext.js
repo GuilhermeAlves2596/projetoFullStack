@@ -1,5 +1,3 @@
-// AuthContext.js
-
 import { Snackbar } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import React, { createContext, useContext, useState } from 'react';
@@ -43,7 +41,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(isAuthenticated);
       }
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
       setError('Erro ao fazer login. Usuario ou senha invalidos.');
       setOpenSnackbar(true);
     }

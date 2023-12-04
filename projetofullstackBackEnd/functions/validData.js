@@ -53,7 +53,7 @@ async function consumeMessages() {
             const messageContent = msg.content.toString();
             console.log(`[RabbitMQ Consumer] Mensagem recebida: ${messageContent}`);
 
-            // Processa a mensagem (armazena no banco de dados neste exemplo)
+            // Processa a mensagem 
             await processMessage(messageContent);
 
             // Confirma o recebimento da mensagem para removê-la da fila
@@ -66,8 +66,7 @@ async function consumeMessages() {
 
 async function processMessage(message) {
     try {
-        // Lógica para processar a mensagem (armazenar no banco de dados neste exemplo)
-        // await sequelize.sync({ force: false });
+        // Salvvar a mensagem no banco
         await logDAO.save(message);
 
         console.log('[RabbitMQ Consumer] Mensagem processada e armazenada no banco de dados.');
@@ -76,7 +75,7 @@ async function processMessage(message) {
     }
 }
 
-// Agendamento para executar o consumidor a cada 1 minutos
+// Agendamento para executar o consumidor a cada 5 minutos
 cron.schedule('*/5 * * * *', async () => {
     console.log('[Scheduled Task] Executando consumidor RabbitMQ...');
     await consumeMessages();
