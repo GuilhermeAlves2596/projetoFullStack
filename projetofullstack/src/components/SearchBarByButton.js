@@ -28,7 +28,6 @@ const SearchBarByButton = () => {
 
   const handleSearchClick = () => {
     if (searchText.length >= 3 && !showModal) {
-      console.log('Pesquisa: '+token)
       const endpoint = `http://localhost:3001/card/${searchText}`;
 
       // Usando a função fetch

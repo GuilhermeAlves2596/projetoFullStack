@@ -1,12 +1,9 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
@@ -14,71 +11,28 @@ import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const theme = createTheme({
-  palette: {
-    error: {
-      main: '#f44336', // Definindo a cor vermelha para o tema de erro
-    },
-  },
-});
+const theme = createTheme();
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://github.com/GuilhermeAlves2596">
-        Guilherme Alves
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
-
-export default function SignInSide() {
+const SignInSide = () => {
   const { login } = useAuth();
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
     try {
-      const userValue = data.get('user');
-      const passwordValue = data.get('password');
-
-      const isAuthenticated = await login(userValue, passwordValue);
+      const isAuthenticated = await login(user, password);
 
       if (isAuthenticated) {
         console.log('Login bem-sucedido!');
-      } else {
-        setError('Usuário ou senha incorretos.');
-        setOpenSnackbar(true);
       }
-
     } catch (error) {
-      // Exibir toast em caso de erro
       console.error('Erro ao fazer login:', error);
     }
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -121,6 +75,8 @@ export default function SignInSide() {
                 name="user"
                 autoComplete="user"
                 autoFocus
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -131,6 +87,8 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <Button
                 type="submit"
@@ -140,16 +98,12 @@ export default function SignInSide() {
               >
                 Sign In
               </Button>
-              <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>
       </Grid>
-      <Snackbar open={openSnackbar} autoHideDuration={6000}>
-        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
-        {error}
-        </Alert>
-      </Snackbar>
     </ThemeProvider>
   );
-}
+};
+
+export default SignInSide;

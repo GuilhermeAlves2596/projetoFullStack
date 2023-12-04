@@ -20,7 +20,6 @@ const Home = () => {
   const token = localStorage.getItem('token')
   const { logout } = useAuth();
 
-  console.log('Home: ' + token)
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -50,7 +49,6 @@ const Home = () => {
   // Salvar uma carta
   const handleCardSubmit = async (name, image, status, species, gender) => {
     try {
-      console.log('Salvar: ' + token)
       const response = await fetch('http://localhost:3001/card', {
         method: 'POST',
         headers: {
