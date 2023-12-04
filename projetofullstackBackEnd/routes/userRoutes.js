@@ -3,6 +3,7 @@ var router = express.Router();
 var userDAO = require('../model/userModel')
 var jwt = require('jsonwebtoken');
 var sanitizer = require('sanitizer');
+const rateLimit = require('express-rate-limit');
 const functions = require('../functions/validData')
 const sequelize = require('../helpers/bd');
 const hashPassword = require('../functions/hashPassword');
@@ -14,6 +15,15 @@ const cache = require('express-redis-cache')({
     port: 6379,
     expire: 60,
  });
+
+ const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 3, // permitir 3 tentativas
+    message: 'Número máximo de tentativas excedido. Tente novamente mais tarde.',
+    handler: (req, res, next) => {
+        res.status(429).json({ status: false, msg: 'Número máximo de tentativas excedido. Tente novamente mais tarde.' });
+      },
+  });
 
  cache.invalidate = (name) => {
     return (req, res, next) => {
@@ -40,7 +50,7 @@ router.get('/', cache.route(), async (req, res) => {
 
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     let { usuario = '', senha = '' } = req.body;
     let msg;
 

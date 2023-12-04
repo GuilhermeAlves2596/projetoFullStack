@@ -3,6 +3,7 @@ const cron = require('node-cron');
 const sequelize = require('../helpers/bd');
 const logDAO = require('../model/logModel');
 var cartaDAO = require('../model/cartaModel')
+const rateLimit = require('express-rate-limit');
 
 const rabbitmqConfig = {
     protocol: 'amqp',
@@ -76,7 +77,7 @@ async function processMessage(message) {
 }
 
 // Agendamento para executar o consumidor a cada 1 minutos
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
     console.log('[Scheduled Task] Executando consumidor RabbitMQ...');
     await consumeMessages();
 });
